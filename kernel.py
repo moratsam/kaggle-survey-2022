@@ -14,6 +14,7 @@ class Kernel:
     notebook_id:    int             # Needed to download the notebook.
     title:          str
     url:            str
+    language:       str             # 'Python'/'R'.
     datasets:       List[Dataset]
     medal:          Optional[str]   # None/'Bronze' ..
     libs:           List[str]       # Libraries used by the notebook.

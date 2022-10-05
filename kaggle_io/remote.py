@@ -35,6 +35,7 @@ def objectivise_kernel(kernel_dict: Dict[str, Any]) -> Kernel:
         notebook_id=kernel_dict['scriptVersionId'],
         title=kernel_dict['title'],
         url=BASE_URL+kernel_dict['scriptUrl'],
+        language=kernel_dict['languageName'],
         datasets=datasets,
         medal=kernel_dict.get('medal'),
         libs=[], # Keep it empty at this point.
