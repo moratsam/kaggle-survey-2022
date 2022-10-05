@@ -38,6 +38,8 @@ def objectivise_kernel(kernel_dict: Dict[str, Any]) -> Kernel:
         datasets=datasets,
         medal=kernel_dict.get('medal'),
         libs=[], # Keep it empty at this point.
+        keywords=[],
+        questions=[],
         comments=kernel_dict.get('totalComments', 0),
         views=kernel_dict.get('totalViews', 0),
         votes=kernel_dict.get('totalVotes', 0),

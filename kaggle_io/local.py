@@ -1,11 +1,14 @@
+import csv
 import json
 import os
 
 from typing import Dict, List
 
 from kernel import Kernel
+from dataclass_csv import DataclassWriter
 
 PATH_NOTEBOOKS_DIR = "notebooks"
+
 
 def dump_notebook(notebook: str, fname: str, full_path=False):
     """
@@ -28,20 +31,19 @@ def dump_notebook(notebook: str, fname: str, full_path=False):
         f.write(notebook)
 
 
-def read_kernels(path: str) -> List[Kernel]:
+def read_kernels(path: str = 'all_kernels.csv') -> List[Kernel]:
     """
-    Read kernels from a JSON file.
+    Read kernels from a CSV file.
     """
-    with open(path, 'r') as f:
-        kernel_dicts = json.load(f)
-        return [Kernel.from_json(k) for k in kernel_dicts] 
+    data = list(csv.reader(open(path)))
+    keys = data[0]
+    return [Kernel(**{k:v for k,v in zip(keys,row)}) for row in data[1:]]
 
-def dump_kernels(kernels: List[Kernel], fname: str = 'all_kernels.json'):
+
+def dump_kernels(kernels: List[Kernel], fname: str = 'all_kernels.csv'):
     """
-    Dump kernels as JSON to disk.
+    Dump kernels as CSV to disk.
     """
-    kernel_dicts = [k.to_json() for k in kernels]
     with open(fname, 'w') as f:
-        json.dump(kernel_dicts, f)
-
-
+        w = DataclassWriter(f, kernels, Kernel)
+        w.write()
