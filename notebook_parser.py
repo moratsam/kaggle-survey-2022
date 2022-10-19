@@ -1,3 +1,4 @@
+from re import findall
 from typing import Any, Dict, List, Optional
 
 class NotebookParser:
@@ -16,3 +17,15 @@ class NotebookParser:
                 imports.add(self.notebook[i+1].split('.')[0])
 
         return list(imports)
+
+
+    def parse_questions(self) -> List[str]:
+        """
+        Given the raw notebook string, return list of all substrings
+        matching 'Q' followed by 1 or 2 digits.
+        """
+        questions = list(set(findall('Q\d{1,2}', self.notebook)))
+
+        # Return sorted list.
+        # When sorting, omit the first char (Q), to sort according to digits.
+        return sorted(questions, key=lambda x: int(x[1:]))

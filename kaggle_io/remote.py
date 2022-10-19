@@ -1,18 +1,30 @@
 import json
 import requests
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from kaggle_io.constants import BODY, HEADERS, PARAMS, POST_URL, BASE_URL
 
 from kernel import Dataset, Kernel
 
-def download_notebook(notebook_id) -> str:
+def download_notebook(notebook_id: int, language='Python') -> str:
+    from kaggle_io.constants import BODY, HEADERS, PARAMS, POST_URL, BASE_URL
     """
     Return a raw notebook string.
     """
     url = f'https://www.kaggle.com/kernels/scriptcontent/{notebook_id}/download' 
-    return str(requests.get(url).content)
+    notebook = requests.get(url, headers=HEADERS).content.decode('utf-8')
+
+    # Retarded but it helps deal with codecs.
+    if language == 'Python':
+        try:
+            notebook = json.dumps(json.loads(notebook))
+        except json.JSONDecodeError:
+            print(f"ERROR: Unrecognised format: {notebook_id}")
+
+    if len(notebook) < 100:
+        raise ValueError(f"Notebook too short: {nb[:100]}")
+    return notebook
 
 
 def objectivise_kernel(kernel_dict: Dict[str, Any]) -> Kernel:
