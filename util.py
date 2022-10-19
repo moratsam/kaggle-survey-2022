@@ -8,7 +8,7 @@ from kernel import Kernel
 
 def parse_questions_and_dump():
     """
-    Parse questions, updated kernels to disk.
+    Parse questions, dump updated kernels to disk.
     """
     kernels = get_kernels(from_disk=True)
     notebook_generator = generate_notebooks(kernels, from_disk=True)
