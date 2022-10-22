@@ -66,7 +66,4 @@ def parse_notebooks():
             kernels[ix].libs = libs
             kernels[ix].questions = questions
 
-    dump_kernels(kernels, path='lmao.csv')
-
-
-parse_notebooks()
+    dump_kernels(kernels)

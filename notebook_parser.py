@@ -7,8 +7,7 @@ def sanitise(string: str) -> str:
     Huge pain in the ass.
     Replace substrings from the input string with whitespaces.
     """
-    REPLACE = ['\\n', '\\r', '\n', '\r' '\t', '*', ',', '"', "'", ':', '-']
-    string = f"---{string}---" # Add some buffer chars to each side.
+    REPLACE = [r'\n', r'\r', r'\t']
     i = 0
     filtered_string = ""
     while i < len(string):
@@ -31,12 +30,18 @@ class NotebookParser:
         """
         Given the raw notebook string, return list of all imported libraries.
         """
+        def make_alpha(string: str) -> str:
+            """
+            Return only alphabetic characters from string.
+            """
+            return ''.join(char for char in string if char.isalpha())
+
         notebook = sanitise(notebook).split()
         imports = set()
         
         if language == 'Python':
             for i, word in enumerate(notebook):
-                if word == "import":
+                if make_alpha(word) == "import":
                     # Check for pattern "from X import Y"
                     if "from" in notebook[i-2]:
                         library = notebook[i-1]
@@ -45,14 +50,21 @@ class NotebookParser:
                         library = notebook[i+1]
                     # If library = 'X.Y.Z', take just 'X'.
                     library = library.split('.')[0]
-                    imports.add(library)
+                    imports.add(make_alpha(library))
 
         elif language == 'R':
             for word in notebook:
-                if word.startswith('library(') and word.endswith(')'):
+                if "library(" in word:
+                    start_ix = word.index("library(") + len("library(")
+                    end_ix = 0
+                    for i, char in enumerate(f"{word[start_ix:]}."):
+                        if not char.isalnum():
+                            end_id=i
+                            break
+                    library = word[start_ix:end_ix]
                     # If library = 'X.Y.Z', take just 'X'.
                     library = word[8:-1].split('.')[0]
-                    imports.add(library)
+                    imports.add(make_alpha(library))
 
         return sorted(list(imports))
 
