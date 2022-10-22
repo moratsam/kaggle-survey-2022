@@ -20,11 +20,12 @@ def download_notebook(notebook_id: int, language='Python') -> str:
         try:
             notebook = json.dumps(json.loads(notebook))
         except json.JSONDecodeError:
-            print(f"ERROR: Unrecognised format: {notebook_id}")
+            print(f"ERROR: Unrecognised format for notebook id: {notebook_id}")
+            language = "UNKNOWN"
 
-    if len(notebook) < 100:
-        raise ValueError(f"Notebook too short: {nb[:100]}")
-    return notebook
+    if len(notebook) < 300:
+        raise ValueError(f"Notebook too short: {nb[:300]}")
+    return notebook, language
 
 
 def objectivise_kernel(kernel_dict: Dict[str, Any]) -> Kernel:

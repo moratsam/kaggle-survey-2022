@@ -35,13 +35,17 @@ def read_notebook(file_prefix: Union[int, str], full_path=False) -> str:
     Read notebook from the PATH_NOTEBOOKS_DIR.
     file_prefix: Can be notebook_id (107352619) or filename (107352619.ipynb)
     """
+    path = ""
     file_prefix = str(file_prefix)
     if full_path:
-        path = full_path
+        path = file_prefix
     else:
         for fname in os.listdir(PATH_NOTEBOOKS_DIR):
             if fname.startswith(file_prefix):
                 path = f"{PATH_NOTEBOOKS_DIR}/{fname}"
+    
+    if path == "":
+        raise ValueError(f"File not found: {file_prefix}")
     
     with open(path, 'r') as f:
         return f.read()
@@ -65,13 +69,14 @@ def read_kernels(path: str = 'all_kernels.csv') -> List[Kernel]:
 
         # Transform string of list into list.
         k.questions = json.loads(k.questions.replace("'", '"'))
+        k.libs = json.loads(k.libs.replace("'", '"'))
     return kernels
 
 
-def dump_kernels(kernels: List[Kernel], fname: str = 'all_kernels.csv'):
+def dump_kernels(kernels: List[Kernel], path: str = 'all_kernels.csv'):
     """
     Dump kernels as CSV to disk.
     """
-    with open(fname, 'w') as f:
+    with open(path, 'w') as f:
         w = DataclassWriter(f, kernels, Kernel)
         w.write()
