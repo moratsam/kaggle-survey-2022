@@ -1,5 +1,7 @@
-from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Dict, List, Optional
+
+from dataclasses import dataclass
 
 @dataclass
 class Dataset:
@@ -13,13 +15,15 @@ class Kernel:
     id: int
     notebook_id:    int             # Needed to download the notebook.
     title:          str
+    created_at:     datetime        # Serialised as '%Y-%m-%d %H:%M:%S'.
+    year:           int             # Year when it was created.
     url:            str
     language:       str             # 'Python'/'R'.
     datasets:       List[Dataset]
     medal:          Optional[str]   # None/'Bronze' ..
     libs:           List[str]       # Libraries used by the notebook.
-    keywords:       List[str]       # TODO 
-    questions:      List[str]       # TODO
+    keywords:       List[str]
+    questions:      List[str]
     topic:          str = ""        # TODO
     comments:       int = 0
     views:          int = 0

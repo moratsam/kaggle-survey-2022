@@ -1,11 +1,11 @@
 import csv
 import json
 import os
-
+from datetime import datetime
 from typing import Dict, List, Union
 
 from kernel import Kernel
-from dataclass_csv import DataclassWriter
+from dataclass_csv import DataclassWriter, dateformat
 
 PATH_NOTEBOOKS_DIR = os.environ.get('PATH_NOTEBOOKS_DIR') or "notebooks"
 
@@ -61,11 +61,10 @@ def read_kernels(path: str = 'all_kernels.csv') -> List[Kernel]:
     # csv.reader reads ints as strings, so they need to be transformed back to int.
     # Retarded, but it works.
     for k in kernels:
-        k.id = int(k.id)
-        k.notebook_id = int(k.notebook_id)
-        k.comments = int(k.comments)
-        k.views = int(k.views)
-        k.votes = int(k.votes)
+        for attr in ("id", "notebook_id", "comments", "views", "votes", "year"):
+            setattr(k, attr, int(getattr(k, attr)))
+
+        k.created_at = datetime.strptime(k.created_at, '%Y-%m-%d %H:%M:%S')
 
         # Transform string of list into list.
         k.questions = json.loads(k.questions.replace("'", '"'))
@@ -73,6 +72,7 @@ def read_kernels(path: str = 'all_kernels.csv') -> List[Kernel]:
     return kernels
 
 
+@dateformat('%Y-%m-%d %H:%M:%S')
 def dump_kernels(kernels: List[Kernel], path: str = 'all_kernels.csv'):
     """
     Dump kernels as CSV to disk.
