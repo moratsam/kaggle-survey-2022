@@ -1,0 +1,22 @@
+Framework,2018,2019,2020,2021,2022
+Scikit-Learn,1,1,1,1,1
+TensorFlow,1,1,1,1,1
+Keras,1,1,1,1,1
+PyTorch,1,1,1,1,1
+Spark MLlib,1,1,0,0,0
+H20,1,0,1,1,0
+Fast.ai,1,1,1,1,1
+Mxnet,1,0,1,1,0
+Caret,1,1,1,1,1
+Xgboost,1,1,1,0,0
+mlr,1,0,0,0,0
+Prophet,1,0,1,1,0
+RandomForest,1,1,0,0,0
+lightGBM,1,1,0,1,1
+catboost,1,0,1,1,1
+CNTK,1,0,0,0,0
+Caffe,1,0,0,0,0
+Tidymodels,0,0,1,1,1
+JAX,0,0,1,1,1
+PyTorch Lightning,0,0,0,1,1
+Huggingface,0,0,0,1,1
