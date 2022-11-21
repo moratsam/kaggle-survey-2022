@@ -26,9 +26,9 @@ class Kernel:
     libs:               List[str]       # Libraries used by the notebook.
     keywords:           List[str]
     tags:               List[str]       # Pulled from meta kaggle.
-    tier:               int             # Tier of the kernel's author [0-5].
+    tier:               Optional[str]   # Tier of the kernel's author.
     questions:          List[str]
-    topic:              str = ""        # TODO
+    topic:              str = ""        
     comments:           int = 0
     views:              int = 0
     votes:              int = 0

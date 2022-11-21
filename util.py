@@ -1,8 +1,12 @@
 import os
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from datetime import datetime
+from requests.sessions import Session
 from typing import List
 
-from kaggle_io.local import dump_kernels, read_kernels, read_notebook
+import pandas as pd
+
+from kaggle_io.local import dump_kernels, read_kernels, dump_notebook, read_notebook
 from kaggle_io.remote import objectivise_kernel, query_kernels, download_notebook
 from kernel import Kernel
 from notebook_parser import NotebookParser
@@ -11,7 +15,25 @@ def get_notebook(notebook_id: int, from_disk: bool = False, full_path=False) -> 
     if from_disk:
         return read_notebook(notebook_id, full_path)
     else:
-        return download_notebook(notebook_id)
+        return download_notebook(notebook_id)[0]
+
+def pull_notebooks(kernels: List[Kernel]) -> None:
+    extensions = {'Python': 'ipynb', 'R': 'Rmd', 'UNKNOWN': "unknown_format.txt"}
+    session = Session()
+    for i,k in enumerate(kernels):
+        if i < 1586:
+            continue
+        print(f'Pulling {i}/{len(kernels)}')
+        notebook, lang = download_notebook(session, k.notebook_id, k.language)
+        if lang != k.language:
+            print(f'Changing {k.id} lang: {k.language} --> {lang}')
+            kernels[i].language = lang
+            dump_kernels(kernels, path='tmp_all_kernels.csv')
+        ext = extensions[lang]
+        dump_notebook(notebook, f'{k.notebook_id}.{ext}')
+
+    dump_kernels(kernels, path='tmp_all_kernels.csv')
+
 
 
 def get_kernels(from_disk: bool = False, fname: str = 'all_kernels.csv') -> List[Kernel]:
@@ -45,11 +67,43 @@ def parse_notebook(notebook_id: int, language: str):
     """
     Parse libs & questions from a single notebook.
     """
+    print(notebook_id)
     notebook = get_notebook(notebook_id, from_disk=True)
     parser = NotebookParser()
     questions = parser.parse_questions(notebook)
     libs = parser.parse_libs(notebook, language)
     return libs, questions
+
+
+def parse_meta_kaggle_data():
+    ks = get_kernels(from_disk=True)
+    """ Files are from the meta kaggle dataset. """
+    df = pd.read_csv('Kernels.csv')
+    for i,k in enumerate(ks):
+       try:
+           ks[i].created_at = datetime.strptime(df.loc[df['Id'] == k.id]['CreationDate'].values[0], '%m/%d/%Y %H:%M:%S')
+       except:
+          pass
+       ks[i].year = datetime.strftime(k.created_at, '%Y')
+       try:
+           ks[i].evaluation_date = datetime.strptime(df.loc[df['Id'] == k.id]['EvaluationDate'].values[0], '%m/%d/%Y')
+       except:
+          pass
+       try:
+           ks[i].made_public_date = datetime.strptime(df.loc[df['Id'] == k.id]['MadePublicDate'].values[0], '%m/%d/%Y')
+       except:
+          pass
+
+    tags = pd.read_csv('Tags.csv')
+    kernel_tags = pd.read_csv('KernelTags.csv')
+    for i,k in enumerate(ks):
+        tag_ids = kernel_tags.loc[kernel_tags['KernelId'] == k.id]['TagId'].values
+        tag_names = tags.loc[tags['Id'].isin(tag_ids)]['Name'].values.tolist()
+        print(tag_names)
+        ks[i].tags = tag_names
+
+    dump_kernels(ks)
+
 
 
 def parse_notebooks():

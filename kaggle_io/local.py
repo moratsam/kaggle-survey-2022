@@ -61,7 +61,7 @@ def read_kernels(path: str = 'all_kernels.csv') -> List[Kernel]:
     # csv.reader reads ints as strings, so they need to be transformed back to int.
     # Retarded, but it works.
     for k in kernels:
-        for attr in ("id", "notebook_id", "comments", 'tier', "views", "votes", "year"):
+        for attr in ("id", "notebook_id", "comments", "views", "votes", "year"):
             setattr(k, attr, int(getattr(k, attr)))
 
         k.evaluation_date = datetime.strptime(k.evaluation_date, '%Y-%m-%d %H:%M:%S')
