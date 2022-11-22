@@ -99,17 +99,14 @@ def parse_meta_kaggle_data():
     for i,k in enumerate(ks):
         tag_ids = kernel_tags.loc[kernel_tags['KernelId'] == k.id]['TagId'].values
         tag_names = tags.loc[tags['Id'].isin(tag_ids)]['Name'].values.tolist()
-        print(tag_names)
         ks[i].tags = tag_names
 
     users = pd.read_csv('Users.csv')
     for i,k in enumerate(ks):
-        print(i)
         try:
             user_id = kernels.loc[kernels['Id'] == k.id, 'AuthorUserId'].values[0]
             tier = users.loc[users['Id'] == user_id, 'PerformanceTier'].values[0]
         except:
-            print("iiiiiiiiiii", i)
             tier = None
         ks[i].tier = tier
 
