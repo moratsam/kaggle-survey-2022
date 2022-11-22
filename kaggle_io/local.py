@@ -1,10 +1,12 @@
 import csv
 import json
 import os
+from ast import literal_eval
 from datetime import datetime
 from typing import Dict, List, Union
 
-from kernel import Kernel
+
+from kernel import Dataset, Kernel
 from dataclass_csv import DataclassWriter, dateformat
 
 PATH_NOTEBOOKS_DIR = os.environ.get('PATH_NOTEBOOKS_DIR') or "notebooks"
@@ -71,6 +73,10 @@ def read_kernels(path: str = 'all_kernels.csv') -> List[Kernel]:
         # Transform string of list into list.
         k.questions = json.loads(k.questions.replace("'", '"'))
         k.libs = json.loads(k.libs.replace("'", '"'))
+
+        # Transform string of list of Datasets into a list of Datasets.
+        k.datasets = [Dataset(*tup) for tup in literal_eval(k.datasets)]
+
     return kernels
 
 

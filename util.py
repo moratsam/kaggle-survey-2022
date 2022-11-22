@@ -76,21 +76,21 @@ def parse_notebook(notebook_id: int, language: str):
 
 
 def parse_meta_kaggle_data():
-    ks = get_kernels(from_disk=True)
     """ Files are from the meta kaggle dataset. """
-    df = pd.read_csv('Kernels.csv')
+    ks = get_kernels(from_disk=True)
+    kernels = pd.read_csv('Kernels.csv')
     for i,k in enumerate(ks):
        try:
-           ks[i].created_at = datetime.strptime(df.loc[df['Id'] == k.id]['CreationDate'].values[0], '%m/%d/%Y %H:%M:%S')
+           ks[i].created_at = datetime.strptime(kernels.loc[kernels['Id'] == k.id]['CreationDate'].values[0], '%m/%d/%Y %H:%M:%S')
        except:
           pass
        ks[i].year = datetime.strftime(k.created_at, '%Y')
        try:
-           ks[i].evaluation_date = datetime.strptime(df.loc[df['Id'] == k.id]['EvaluationDate'].values[0], '%m/%d/%Y')
+           ks[i].evaluation_date = datetime.strptime(kernels.loc[kernels['Id'] == k.id]['EvaluationDate'].values[0], '%m/%d/%Y')
        except:
           pass
        try:
-           ks[i].made_public_date = datetime.strptime(df.loc[df['Id'] == k.id]['MadePublicDate'].values[0], '%m/%d/%Y')
+           ks[i].made_public_date = datetime.strptime(kernels.loc[kernels['Id'] == k.id]['MadePublicDate'].values[0], '%m/%d/%Y')
        except:
           pass
 
@@ -101,6 +101,17 @@ def parse_meta_kaggle_data():
         tag_names = tags.loc[tags['Id'].isin(tag_ids)]['Name'].values.tolist()
         print(tag_names)
         ks[i].tags = tag_names
+
+    users = pd.read_csv('Users.csv')
+    for i,k in enumerate(ks):
+        print(i)
+        try:
+            user_id = kernels.loc[kernels['Id'] == k.id, 'AuthorUserId'].values[0]
+            tier = users.loc[users['Id'] == user_id, 'PerformanceTier'].values[0]
+        except:
+            print("iiiiiiiiiii", i)
+            tier = None
+        ks[i].tier = tier
 
     dump_kernels(ks)
 
